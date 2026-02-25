@@ -126,4 +126,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <p align="center">
   Built with ❤️ for the AI Community by <a href="https://github.com/not-indro">not-indro</a>
 </p>
-# AI-Weekly-Digest
