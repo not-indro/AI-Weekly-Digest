@@ -1,0 +1,18 @@
+{
+    "functions": {
+        "api/*.py": {
+            "maxDuration": 60
+        }
+    },
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/api/$1"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/public/$1"
+        }
+    ],
+    "outputDirectory": "."
+}

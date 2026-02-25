@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Weekly Digest</title>
+    <meta name="description"
+        content="AI Weekly Digest — Automated Briefing with AI. Powered by Tavily search and Groq.">
+    <meta name="theme-color" content="#0b0f1a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div>
+                    <h1 class="logo-title">AI Weekly Digest</h1>
+                    <p class="logo-subtitle">Automated Briefing with AI</p>
+                </div>
+            </div>
+            <button class="help-trigger" onclick="document.getElementById('help-modal').style.display='flex'"
+                aria-label="How to use">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                How to Use
+            </button>
+        </div>
+    </header>
+
+    <!-- Controls -->
+    <main class="main">
+        <div class="controls-card">
+            <div class="controls-row">
+                <div class="control-group">
+                    <label for="days-input" class="control-label">Search Window</label>
+                    <div class="input-with-suffix">
+                        <input type="number" id="days-input" value="7" min="1" max="30" class="control-input">
+                        <span class="input-suffix">days</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label for="lang-select" class="control-label">Language</label>
+                    <div class="input-with-suffix">
+                        <select id="lang-select" class="control-select">
+                            <option value="en">EN · English</option>
+                            <option value="hi">HI · Hindi</option>
+                            <option disabled>──────────</option>
+                            <option value="fr">FR · French</option>
+                            <option value="es">ES · Spanish</option>
+                            <option value="de">DE · German</option>
+                            <option value="zh">ZH · Chinese</option>
+                            <option value="ja">JA · Japanese</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group control-actions">
+                    <button id="generate-btn" class="btn btn-primary" onclick="generateNewsletter()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" />
+                        </svg>
+                        Generate Newsletter
+                    </button>
+                    <button id="download-btn" class="btn btn-secondary" onclick="downloadHTML()" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7,10 12,15 17,10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        HTML
+                    </button>
+                    <button id="copyToClipboardBtn" class="btn btn-secondary" onclick="copyToClipboard()" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
+                    <button id="shareEmailBtn" class="btn btn-secondary" onclick="shareViaEmail()" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
+                        </svg>
+                        Email
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Tuning Panel -->
+        <div class="tuning-panel" id="tuning-panel">
+            <button class="tuning-toggle" id="tuning-toggle" onclick="toggleTuning()">
+                <span class="tuning-toggle-left">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    Advanced Tuning
+                </span>
+                <svg class="tuning-chevron" id="tuning-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <polyline points="6,9 12,15 18,9" />
+                </svg>
+            </button>
+            <div class="tuning-content" id="tuning-content" style="display: none;">
+                <div class="tuning-header">
+                    <div class="control-group">
+                        <label for="profile-select" class="control-label">Profile</label>
+                        <div class="input-with-suffix">
+                            <select id="profile-select" class="control-select" onchange="applyProfile()">
+                                <option value="balanced">⚖ Balanced</option>
+                                <option value="strict">🎯 Strict</option>
+                                <option value="exploratory">🔍 Exploratory</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="tuning-grid" id="tuning-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div id="progress-container" class="progress-container" style="display: none;">
+            <div class="progress-header">
+                <div class="progress-header-left">
+                    <span id="progress-pct" class="progress-pct">0%</span>
+                    <span id="progress-text" class="progress-label">Generating...</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <span id="progress-time" class="progress-time"></span>
+                    <span id="progress-count" class="progress-count">0 / 9</span>
+                </div>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+            </div>
+            <div id="section-status" class="section-status-grid"></div>
+        </div>
+
+        <!-- Error -->
+        <div id="error-container" class="error-container" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Result -->
+        <div id="result-container" class="result-container" style="display: none;">
+            <div class="result-header">
+                <h2 class="result-title">Generated Newsletter</h2>
+                <span id="result-date" class="result-date"></span>
+            </div>
+            <iframe id="newsletter-frame" class="newsletter-frame"></iframe>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>AI Weekly Digest · Automated Briefing with AI</p>
+    </footer>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal-overlay" style="display:none"
+        onclick="if(event.target===this)this.style.display='none'">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 class="modal-title">How to Use</h2>
+                <button class="modal-close" onclick="document.getElementById('help-modal').style.display='none'"
+                    aria-label="Close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="help-step">
+                    <span class="help-num">1</span>
+                    <div>
+                        <strong>Set your search window</strong>
+                        <p>Choose how many days back to look for AI news (default is 7 days). A wider window finds more
+                            articles but may include older stories.</p>
+                    </div>
+                </div>
+                <div class="help-step">
+                    <span class="help-num">2</span>
+                    <div>
+                        <strong>Pick a language</strong>
+                        <p>Select English or French. The entire newsletter — headlines, summaries, and section titles —
+                            will be generated in your chosen language.</p>
+                    </div>
+                </div>
+                <div class="help-step">
+                    <span class="help-num">3</span>
+                    <div>
+                        <strong>Hit Generate</strong>
+                        <p>Click the purple <em>Generate Newsletter</em> button. The system will search for articles,
+                            then summarize each section using AI. This takes about 3–4 minutes.</p>
+                    </div>
+                </div>
+                <div class="help-step">
+                    <span class="help-num">4</span>
+                    <div>
+                        <strong>Watch the progress</strong>
+                        <p>Each section lights up as it's processed. Green means done, red means an error occurred. A
+                            cooldown timer appears between sections to stay within API limits.</p>
+                    </div>
+                </div>
+                <div class="help-step">
+                    <span class="help-num">5</span>
+                    <div>
+                        <strong>Review &amp; download</strong>
+                        <p>When all sections are complete, the finished newsletter appears below. Click <em>Download
+                                HTML</em> to save it as a file you can email or publish.</p>
+                    </div>
+                </div>
+                <div class="help-divider"></div>
+                <div class="help-step">
+                    <span class="help-num">⚙</span>
+                    <div>
+                        <strong>Advanced Tuning (optional)</strong>
+                        <p>Expand the Advanced Tuning panel to fine-tune individual sections. You can adjust the
+                            relevance threshold (higher = stricter filtering) and the number of articles per section.
+                            Try the <em>Strict</em> profile for tighter curation or <em>Exploratory</em> for broader
+                            coverage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
