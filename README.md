@@ -104,3 +104,4 @@ ai_newsletter_automation/
 ## License
 
 MIT
+# AI-Weekly-Digest
