@@ -1,107 +1,129 @@
 # AI Weekly Digest — Automated Briefing with AI
 
-An open-source, automated pipeline that generates a weekly AI briefing. Searches multiple sources, verifies links, scrapes content, and uses LLM summarization to produce a polished, Outlook-ready newsletter.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnot-indro%2FAI-Weekly-Digest&env=TAVILY_API_KEY,GROQ_API_KEY&project-name=ai-weekly-digest&repository-name=AI-Weekly-Digest)
+![License](https://img.shields.io/github/license/not-indro/AI-Weekly-Digest?color=blue)
+![Python](https://img.shields.io/badge/python-3.9+-yellow)
 
-## Features
+An open-source, automated pipeline that generates a high-quality weekly AI briefing. It searches multiple sources, verifies links, scrapes content, and uses Llama 3 summarization to produce a polished, Outlook-ready newsletter.
 
-- **9 curated sections**: Trending AI, Indian News, Global News, Events, CSPS/Public-Servant Events, Grain/Agri-Tech, AI Progress, Plain-Language Research, Deep Dive
-- **Multi-source collection**: Tavily search, Hacker News, Product Hunt, arXiv, PapersWithCode, 9 curated RSS feeds (OpenAI, Anthropic, DeepMind, Meta AI, Google AI, Microsoft Research, OECD.AI, GovTech, Stanford HAI)
-- **Smart filtering**: Paywall detection (text phrases + JSON-LD), link verification, URL deduplication
-- **LLM summarization**: Groq (Llama 3.1 70B) with section-aware prompts and JSON-only output
-- **Web interface**: Premium dashboard with live progress tracking, section-by-section generation, and HTML download
-- **CLI mode**: Local command-line usage for power users
+---
 
-## Quick Start (Vercel)
+## ✨ Key Features
 
-> **⚠️ Required:** The app will not work without API keys set in Vercel. Both keys below are free-tier eligible.
+- **7 Curated Sections**: Trending AI, Indian News, Global Policy, Events, AI Progress, Plain-Language Research, and Deep Dive Reports.
+- **Multi-Source Intelligence**: Tavily Search, Hacker News, Product Hunt, arXiv, PapersWithCode, and 12+ curated RSS feeds.
+- **Smart Filtering**: Automatic paywall detection, link verification (404/SSL), and URL deduplication.
+- **LLM Summarization**: Powered by **Groq (Llama 3.1 70B)** for lightning-fast, section-aware insights.
+- **Premium Dashboard**: Modern web interface with real-time generation tracking and one-click HTML download.
 
-1. **Fork** this repo on GitHub
-2. **Import** it in [Vercel](https://vercel.com)
-3. **Set environment variables** in Vercel → Project Settings → Environment Variables:
-   - `TAVILY_API_KEY` — get one at [tavily.com](https://tavily.com)
-   - `GROQ_API_KEY` — get one at [console.groq.com](https://console.groq.com)
-4. **Redeploy** after adding the keys — Vercel will handle the rest
+---
 
-## Local Development
+## 🚀 Quick Start (Vercel)
+
+The fastest way to get your own instance running:
+
+1. **Fork** this repository.
+2. **Deploy to Vercel**: Click the "Deploy" button above or import your fork manually.
+3. **Configure Environment Variables** in Vercel:
+   - `TAVILY_API_KEY`: Get one at [tavily.com](https://tavily.com) (Free tier available).
+   - `GROQ_API_KEY`: Get one at [console.groq.com](https://console.groq.com) (Free tier available).
+4. **Redeploy**: Once keys are added, your dashboard is ready!
+
+---
+
+## 💻 Local Development
 
 ```bash
-# Clone and setup
-git clone https://github.com/your-username/ai-weekly-digest.git
-cd ai-weekly-digest
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # macOS/Linux
+# Clone the repository
+git clone https://github.com/not-indro/AI-Weekly-Digest.git
+cd AI-Weekly-Digest
+
+# Setup virtual environment
+python -m venv venv
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate   # Windows
+
+# Install dependencies
 pip install -r requirements.txt
 
-# Configure
+# Setup environment
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env and add your API keys
 
-# Run CLI
-python -m ai_newsletter_automation.runner --since-days 7 --dry-run
-# Output → output/newsletter.html
+# Start local server
+python local_dev_server.py
+```
+Open [http://localhost:8000](http://localhost:8000) to see the dashboard.
+
+---
+
+## 🏗️ Architecture & Logic
+
+### Project Structure
+```text
+├── api/                     # Vercel Serverless (Python)
+│   ├── generate_section.py  # Orchestrates search + summary
+│   ├── search_section.py    # Per-section discovery endpoint
+│   ├── summarize_section.py # LLM summarization wrapper
+│   ├── render.py            # Final Jinja2 HTML assembly
+│   └── health.py            # API health monitoring
+├── public/                  # Frontend Dashboard
+│   ├── index.html           # Glassmorphic UI
+│   ├── style.css            # Modern dark-mode styling
+│   └── app.js               # Async state & progress management
+├── ai_newsletter_automation/ # Core Engine
+│   ├── runner.py            # Entry point for generation pipeline
+│   ├── search.py            # Multi-source scrapers (HN, RSS, Tavily)
+│   ├── verify.py            # Paywall & link validity checker
+│   ├── scrape.py            # HTML-to-Text cleaner
+│   ├── summarize.py         # Groq LLM integration
+│   ├── rerank.py            # Relevance-based scoring
+│   └── models.py            # Pydantic data structures
+└── template/                # Newsletter Themes
+    └── newsletter.html.j2   # Responsive Jinja2 MJML-like template
 ```
 
-### CLI Options
+### ⚙️ How it Works
+1.  **Discovery**: The engine triggers simultaneous searches across Tavily (Web), Hacker News (Trending), arXiv (Research), and 12+ curated AI lab RSS feeds.
+2.  **Verification**: Links are checked for 404s, SSL issues, and common paywall fingerprinting.
+3.  **Extraction**: Valid articles are stripped of JS/Ads and converted into clean Markdown-like text for the LLM.
+4.  **Intelligence**: **GROQ (Llama 3.1 70B)** summarizes the content, scores it for relevance, and extracts key insights into structured JSON.
+5.  **Assembly**: The dashboard collects these JSON chunks and renders a final, Outlook-compatible HTML newsletter using Jinja2 templates.
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `--since-days N` | Search window in days | 7 |
-| `--date YYYY-MM-DD` | Override newsletter date | today |
-| `--max-per-stream N` | Max articles per section | auto |
-| `--dry-run` | Write HTML only (no Outlook) | off |
 
-## Architecture
+---
 
-```
-ai_newsletter_automation/
-├── api/                        # Vercel serverless functions
-│   ├── generate_section.py     # Per-section generation endpoint
-│   ├── render.py               # Jinja2 HTML rendering endpoint
-│   └── health.py               # Health check
-├── public/                     # Static frontend
-│   ├── index.html
-│   ├── style.css
-│   └── app.js
-├── ai_newsletter_automation/   # Core Python pipeline
-│   ├── config.py               # Settings from env vars
-│   ├── models.py               # Data models (ArticleHit, SummaryItem, etc.)
-│   ├── search.py               # Multi-source article search
-│   ├── verify.py               # Link verification + paywall detection
-│   ├── scrape.py               # HTML → text extraction
-│   ├── summarize.py            # Groq LLM summarization
-│   ├── assemble.py             # Jinja2 newsletter rendering
-│   └── runner.py               # CLI + process_section() API
-├── template/
-│   └── newsletter.html.j2      # Newsletter HTML template
-├── vercel.json                 # Vercel deployment config
-└── requirements.txt
-```
+## 📧 Newsletter Sections
 
-## Newsletter Sections
+| Section | Focus | Sources |
+| :--- | :--- | :--- |
+| **Trending AI** | Major launches & news | HN, Product Hunt, RSS |
+| **Indian News** | Indian AI ecosystem | Local outlets, Tavily |
+| **Global News** | Regulation & Ethics | OECD, G7, Major Govs |
+| **Events** | Conferences & Webinars | Curated calendars |
+| **AI Progress** | SOTA & Benchmarks | PapersWithCode |
+| **Research** | Plain-language papers | arXiv |
+| **Deep Dive** | Long-form reports | NIST, MIT, Stanford |
 
-| Section | Source | Items |
-|---------|--------|-------|
-| Trending AI | HN + Product Hunt + RSS + Tavily | 8 |
-| Indian News | Tavily (India-focused queries) | 5 |
-| Global News | Tavily (policy/workforce focus) | 5 |
-| Events | Tavily (conferences/webinars) | 4 |
-| Public-Servant Events | Tavily (CSPS domain-locked) | 4 |
-| Grain / Agri-Tech | Tavily (agriculture + ML) | 3 |
-| AI Progress | PapersWithCode trending | 3 |
-| Plain-Language Research | arXiv API (cs.AI, cs.LG, stat.ML) | 3 |
-| Deep Dive | Tavily (OECD, Anthropic, MIT reports) | 2 |
+---
 
-## Environment Variables
+## 🛠️ Configuration
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `TAVILY_API_KEY` | Yes | Web search API key |
-| `GROQ_API_KEY` | Yes | LLM summarization API key |
-| `RUN_DAYS` | No | Default search window (default: 7) |
-| `MAX_PER_STREAM` | No | Override max items per section |
+| Variable | Required | Purpose |
+| :--- | :--- | :--- |
+| `TAVILY_API_KEY` | **Yes** | Web search and source discovery |
+| `GROQ_API_KEY` | **Yes** | LLM summarization and analysis |
+| `MAX_PER_STREAM` | No | Limit articles per section (Default: auto) |
 
-## License
+---
 
-MIT
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+<p align="center">
+  Built with ❤️ for the AI Community by <a href="https://github.com/not-indro">not-indro</a>
+</p>
 # AI-Weekly-Digest
